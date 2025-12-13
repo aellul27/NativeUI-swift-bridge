@@ -1,0 +1,16 @@
+[package]
+name = "rustbridge_tests"
+version = "0.1.0"
+edition = "2021"
+
+# This crate is intended to live inside the swiftbridge Xcode project repo
+# and link against the locally-built swiftbridge.framework.
+build = "build.rs"
+
+[dependencies]
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3

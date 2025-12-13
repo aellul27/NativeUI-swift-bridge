@@ -10,7 +10,7 @@ import AppKit
 // C ABI function to get a pointer to the shared NSApplication
 @_cdecl("swift_appkit_create_app")
 public func swift_appkit_create_app() -> UnsafeMutableRawPointer? {
-    if !Thread.isMainThread {
+    guard Thread.isMainThread else {
         swiftbridge_set_last_error("swift_appkit_create_app must be called on the main thread")
         return nil
     }
