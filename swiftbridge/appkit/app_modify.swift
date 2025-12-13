@@ -16,3 +16,16 @@ public func swift_set_title(window_ptr: UnsafeMutableRawPointer, title: UnsafePo
         window.title = t
     }
 }
+
+@_cdecl("swift_set_location")
+public func swift_set_location(
+    _ window_ptr: UnsafeMutableRawPointer,
+    _ x: Double,
+    _ y: Double
+) {
+    DispatchQueue.main.async {
+        let newOrigin = NSPoint(x: x, y: y)
+        let window = Unmanaged<NSWindow>.fromOpaque(window_ptr).takeUnretainedValue()
+        window.setFrameOrigin(newOrigin)
+    }
+}
