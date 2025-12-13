@@ -9,9 +9,10 @@
 import AppKit
 
 @_cdecl("swift_set_title")
-public func swift_set_title(title: UnsafePointer<CChar>) {
+public func swift_set_title(window_ptr: UnsafeMutableRawPointer, title: UnsafePointer<CChar>) {
     let t = String(cString: title)
     DispatchQueue.main.async {
-        NSApp.windows.first?.title = t
+        let window = Unmanaged<NSWindow>.fromOpaque(window_ptr).takeUnretainedValue()
+        window.title = t
     }
 }
