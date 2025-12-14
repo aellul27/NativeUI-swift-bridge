@@ -36,7 +36,7 @@ fn main() {
     assert_ok("initial last_error is None", take_last_error().is_none());
 
     // 2) swift_appkit_create_app: success on main thread
-    let app = SwiftApp::new().unwrap_or_else(|e| {
+    let _app = SwiftApp::new().unwrap_or_else(|e| {
         eprintln!("FAIL: SwiftApp::new on main thread: {e}");
         std::process::exit(1);
     });
@@ -80,7 +80,6 @@ fn main() {
             eprintln!("FAIL: get_screen_array: {e}");
             std::process::exit(1);
         });
-        assert_ok("screen array count>=0", screens.len() >= 0);
         if let Some(first) = screens.first().copied() {
             let w = nsscreen::width(first).unwrap();
             let h = nsscreen::height(first).unwrap();
