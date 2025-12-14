@@ -24,11 +24,11 @@ unsafe extern "C" {
         title: *const c_char,
     ) -> *mut c_void;
 
-    pub fn swift_window_release(window_ptr: *mut c_void);
+    pub fn swift_appkit_window_release(window_ptr: *mut c_void);
 
-    pub fn swift_set_title(window_ptr: *mut c_void, title: *const c_char);
+    pub fn swift_appkit_set_title(window_ptr: *mut c_void, title: *const c_char);
 
-    pub fn swift_set_location(window_ptr: *mut c_void, x: f64, y: f64);
+    pub fn swift_appkit_set_location(window_ptr: *mut c_void, x: f64, y: f64);
 
     pub fn swift_appkit_run(app_ptr: *mut c_void);
 

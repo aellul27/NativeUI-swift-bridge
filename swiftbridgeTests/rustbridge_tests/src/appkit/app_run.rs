@@ -70,7 +70,7 @@ impl SwiftWindow {
 impl Drop for SwiftWindow {
     fn drop(&mut self) {
         if !self.window_ptr.is_null() {
-            unsafe { ffi::swift_window_release(self.window_ptr) };
+            unsafe { ffi::swift_appkit_window_release(self.window_ptr) };
             self.window_ptr = std::ptr::null_mut();
         }
     }

@@ -78,7 +78,7 @@ public func swift_appkit_run(_ appPtr: UnsafeRawPointer?) {
     app.run()
 }
 
-@_cdecl("swift_window_release")
+@_cdecl("swift_appkit_window_release")
 public func swift_window_release(_ windowPtr: UnsafeMutableRawPointer?) {
     guard let windowPtr else { return }
     Unmanaged<NSWindow>.fromOpaque(windowPtr).release()

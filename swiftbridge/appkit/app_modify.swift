@@ -8,7 +8,7 @@
 
 import AppKit
 
-@_cdecl("swift_set_title")
+@_cdecl("swift_appkit_set_title")
 public func swift_set_title(window_ptr: UnsafeMutableRawPointer?, title: UnsafePointer<CChar>?) {
     guard let window_ptr else {
         swiftbridge_set_last_error("swift_set_title received a null window pointer")
@@ -25,7 +25,7 @@ public func swift_set_title(window_ptr: UnsafeMutableRawPointer?, title: UnsafeP
     }
 }
 
-@_cdecl("swift_set_location")
+@_cdecl("swift_appkit_set_location")
 public func swift_set_location(
     _ window_ptr: UnsafeMutableRawPointer?,
     _ x: Double,
