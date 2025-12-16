@@ -79,7 +79,15 @@ public func swift_appkit_run(_ appPtr: UnsafeRawPointer?) {
 }
 
 @_cdecl("swift_appkit_window_release")
-public func swift_appkit_window_release(_ windowPtr: UnsafeMutableRawPointer?) {
+public func swift_window_release(_ windowPtr: UnsafeMutableRawPointer?) {
     guard let windowPtr else { return }
-    Unmanaged<NSWindow>.fromOpaque(windowPtr).release()
+    let closeAndRelease = {
+        let window = Unmanaged<NSWindow>.fromOpaque(windowPtr).takeRetainedValue()
+        window.close()
+    }
+    if Thread.isMainThread {
+        closeAndRelease()
+    } else {
+        DispatchQueue.main.async(execute: closeAndRelease)
+    }
 }
