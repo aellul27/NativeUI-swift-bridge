@@ -30,6 +30,8 @@ unsafe extern "C" {
 
     pub fn swift_appkit_set_location(window_ptr: *mut c_void, x: f64, y: f64);
 
+    pub fn swift_appkit_set_size(window_ptr: *mut c_void, width: f64, height: f64);
+
     pub fn swift_appkit_run(app_ptr: *mut c_void);
 
     // NSScreen

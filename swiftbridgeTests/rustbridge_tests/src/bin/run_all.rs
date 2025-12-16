@@ -26,6 +26,19 @@ fn assert_contains(name: &str, haystack: &str, needle: &str) {
     }
 }
 
+fn poll_last_error(timeout: Duration) -> Option<String> {
+    let deadline = std::time::Instant::now() + timeout;
+    loop {
+        if let Some(err) = take_last_error() {
+            return Some(err);
+        }
+        if std::time::Instant::now() >= deadline {
+            return None;
+        }
+        thread::sleep(Duration::from_millis(5));
+    }
+}
+
 fn main() {
     // This binary runs on the process main thread.
     // That matters because several Swift functions enforce main-thread usage.
@@ -115,6 +128,10 @@ fn main() {
         eprintln!("FAIL: set_location: {e}");
         std::process::exit(1);
     });
+    app_modify::set_size(window.as_ptr(), 320.0, 240.0).unwrap_or_else(|e| {
+        eprintln!("FAIL: set_size: {e}");
+        std::process::exit(1);
+    });
 
     // Error paths: null window pointer
     clear_last_error();
@@ -125,11 +142,53 @@ fn main() {
     let err = app_modify::set_location(std::ptr::null_mut(), 0.0, 0.0).err().unwrap();
     assert_contains("set_location null window", &err, "null window pointer");
 
+    clear_last_error();
+    let err = app_modify::set_size(std::ptr::null_mut(), 1.0, 1.0).err().unwrap();
+    assert_contains("set_size null window", &err, "null window pointer");
+
+    // Error path: null title pointer (must call FFI directly to pass null)
+    clear_last_error();
+    unsafe { rustbridge_tests::ffi::swift_appkit_set_title(window.as_ptr(), std::ptr::null()) };
+    let err = take_last_error().unwrap_or_else(|| {
+        eprintln!("FAIL: set_title null title: expected error");
+        std::process::exit(1);
+    });
+    assert_contains("set_title null title", &err, "swift_appkit_set_title");
+    assert_contains("set_title null title", &err, "null title pointer");
+
+    // Error paths: unknown window pointer (Swift validates against NSApplication.shared.windows)
+    // These errors are reported from a main-queue async block, so poll briefly.
+    let bogus_ptr = 0xDEAD_BEEFu64 as usize as *mut std::ffi::c_void;
+
+    clear_last_error();
+    unsafe { rustbridge_tests::ffi::swift_appkit_set_title(bogus_ptr, b"x\0".as_ptr().cast()) };
+    let err = poll_last_error(Duration::from_millis(250)).unwrap_or_else(|| {
+        eprintln!("FAIL: set_title unknown window: expected error");
+        std::process::exit(1);
+    });
+    assert_contains("set_title unknown window", &err, "unknown window pointer");
+
+    clear_last_error();
+    unsafe { rustbridge_tests::ffi::swift_appkit_set_location(bogus_ptr, 0.0, 0.0) };
+    let err = poll_last_error(Duration::from_millis(250)).unwrap_or_else(|| {
+        eprintln!("FAIL: set_location unknown window: expected error");
+        std::process::exit(1);
+    });
+    assert_contains("set_location unknown window", &err, "unknown window pointer");
+
+    clear_last_error();
+    unsafe { rustbridge_tests::ffi::swift_appkit_set_size(bogus_ptr, 1.0, 1.0) };
+    let err = poll_last_error(Duration::from_millis(250)).unwrap_or_else(|| {
+        eprintln!("FAIL: set_size unknown window: expected error");
+        std::process::exit(1);
+    });
+    assert_contains("set_size unknown window", &err, "unknown window pointer");
+
     // 8) swift_appkit_run error path (null)
     let err = SwiftApp::run_with_null_for_test().unwrap_or_else(|| "expected error".to_string());
     assert_contains("appkit_run null ptr", &err, "null app pointer");
 
-    // Give the main queue a moment to process the async title/location calls.
+    // Give the main queue a moment to process the async title/location/size calls.
     thread::sleep(Duration::from_millis(50));
 
     println!("OK: rustbridge_tests run_all completed");

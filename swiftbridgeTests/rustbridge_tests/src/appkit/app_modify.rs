@@ -24,3 +24,12 @@ pub fn set_location(window_ptr: *mut std::ffi::c_void, x: f64, y: f64) -> Result
     }
     Ok(())
 }
+
+pub fn set_size(window_ptr: *mut std::ffi::c_void, width: f64, height: f64) -> Result<(), String> {
+    unsafe { ffi::swift_appkit_set_size(window_ptr, width, height) };
+
+    if let Some(err) = take_last_error() {
+        return Err(err);
+    }
+    Ok(())
+}
