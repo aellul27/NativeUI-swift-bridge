@@ -48,9 +48,9 @@ internal struct ReusableRawBuffer {
 
 @usableFromInline
 internal struct ArrayView<Header, Element> {
-    var base: UnsafeMutableRawPointer
-    var header: UnsafeMutablePointer<Header>
-    var elements: UnsafeMutablePointer<Element>
+    let base: UnsafeMutableRawPointer
+    let header: UnsafeMutablePointer<Header>
+    let elements: UnsafeMutablePointer<Element>
 }
 
 /// Creates a typed view over a Swift-owned raw buffer laid out as:

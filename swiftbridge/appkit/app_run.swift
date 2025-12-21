@@ -9,14 +9,14 @@ import AppKit
 
 // C ABI function to get a pointer to the shared NSApplication
 @_cdecl("swift_appkit_create_app")
-public func swift_appkit_create_app() -> UnsafeMutableRawPointer? {
+public func swift_appkit_create_app() -> UnsafeRawPointer? {
     guard Thread.isMainThread else {
         swiftbridge_set_last_error("swift_appkit_create_app must be called on the main thread")
         return nil
     }
     let app = NSApplication.shared
     app.setActivationPolicy(.regular)
-    return Unmanaged.passUnretained(app).toOpaque()
+    return UnsafeRawPointer(Unmanaged.passUnretained(app).toOpaque())
 }
 
 // C ABI function to create a window using the provided app pointer
@@ -27,13 +27,13 @@ public func swift_appkit_create_window(
     _ width: Double,
     _ height: Double,
     _ titlePtr: UnsafePointer<CChar>?
-) -> UnsafeMutableRawPointer? {
+) -> UnsafeRawPointer? {
     guard let titlePtr else {
         swiftbridge_set_last_error("swift_appkit_create_window received a null title pointer")
         return nil
     }
 
-    let makeWindow: () -> UnsafeMutableRawPointer? = {
+    let makeWindow: () -> UnsafeRawPointer? = {
         let title = String(cString: titlePtr)
 
         let window = NSWindow(
@@ -48,13 +48,13 @@ public func swift_appkit_create_window(
         window.makeKeyAndOrderFront(nil)
 
         // Keep the window alive across the FFI boundary.
-        return Unmanaged.passRetained(window).toOpaque()
+        return UnsafeRawPointer(Unmanaged.passRetained(window).toOpaque())
     }
 
     if Thread.isMainThread {
         return makeWindow()
     }
-    var result: UnsafeMutableRawPointer?
+    var result: UnsafeRawPointer?
     DispatchQueue.main.sync {
         result = makeWindow()
     }
@@ -79,7 +79,7 @@ public func swift_appkit_run(_ appPtr: UnsafeRawPointer?) {
 }
 
 @_cdecl("swift_appkit_window_release")
-public func swift_window_release(_ windowPtr: UnsafeMutableRawPointer?) {
+public func swift_window_release(_ windowPtr: UnsafeRawPointer?) {
     guard let windowPtr else { return }
     let closeAndRelease = {
         let window = Unmanaged<NSWindow>.fromOpaque(windowPtr).takeRetainedValue()

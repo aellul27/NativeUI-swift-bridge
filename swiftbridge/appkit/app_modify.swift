@@ -7,9 +7,9 @@
 
 import AppKit
 
-private func windowFromPointer(_ pointer: UnsafeMutableRawPointer, caller: String) -> NSWindow? {
+private func windowFromPointer(_ pointer: UnsafeRawPointer, caller: String) -> NSWindow? {
     let matchesPointer: (NSWindow) -> Bool = {
-        Unmanaged.passUnretained($0).toOpaque() == pointer
+        UnsafeRawPointer(Unmanaged.passUnretained($0).toOpaque()) == pointer
     }
 
     guard let window = NSApplication.shared.windows.first(where: matchesPointer) else {
@@ -20,7 +20,7 @@ private func windowFromPointer(_ pointer: UnsafeMutableRawPointer, caller: Strin
 }
 
 @_cdecl("swift_appkit_set_title")
-public func swift_appkit_set_title(windowPtr: UnsafeMutableRawPointer?, title: UnsafePointer<CChar>?) {
+public func swift_appkit_set_title(windowPtr: UnsafeRawPointer?, title: UnsafePointer<CChar>?) {
     guard let windowPtr else {
         swiftbridge_set_last_error("swift_appkit_set_title received a null window pointer")
         return
@@ -49,7 +49,7 @@ public func swift_appkit_set_title(windowPtr: UnsafeMutableRawPointer?, title: U
 
 @_cdecl("swift_appkit_set_location")
 public func swift_appkit_set_location(
-    _ windowPtr: UnsafeMutableRawPointer?,
+    _ windowPtr: UnsafeRawPointer?,
     _ originX: Double,
     _ originY: Double
 ) {
@@ -78,7 +78,7 @@ public func swift_appkit_set_location(
 
 @_cdecl("swift_appkit_set_size")
 public func swift_appkit_set_size(
-    _ windowPtr: UnsafeMutableRawPointer?,
+    _ windowPtr: UnsafeRawPointer?,
     _ width: Double,
     _ height: Double
 ) {
@@ -108,7 +108,7 @@ public func swift_appkit_set_size(
 }
 
 @_cdecl("swift_appkit_close_window")
-public func swift_appkit_close_window(_ windowPtr: UnsafeMutableRawPointer?) {
+public func swift_appkit_close_window(_ windowPtr: UnsafeRawPointer?) {
     guard let windowPtr else {
         swiftbridge_set_last_error("swift_appkit_close_window received a null window pointer")
         return

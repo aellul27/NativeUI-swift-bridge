@@ -9,11 +9,9 @@ import AppKit
 import CoreGraphics
 
 private struct SwiftNSScreenArrayHeader {
-    var count: Int32
-    var reserved: Int32
-    /// Pointer to the first element of the screen pointer array.
-    /// Points into the same Swift-owned buffer returned by `swift_nsscreen_get_screen_array`.
-    var items: UnsafeMutablePointer<UnsafeRawPointer?>?
+    let count: Int32
+    let reserved: Int32
+    let items: UnsafePointer<UnsafeRawPointer?>?
 }
 
 private var gScreenArrayBuffer = ReusableRawBuffer()
@@ -21,9 +19,9 @@ private var gScreensStrongRefs: [NSScreen] = []
 private var gPrimaryScreenStrongRef: NSScreen? = NSScreen.main
 
 private struct NSScreenArrayViewBuffer {
-    var base: UnsafeMutableRawPointer
-    var header: UnsafeMutablePointer<SwiftNSScreenArrayHeader>
-    var elements: UnsafeMutablePointer<UnsafeRawPointer?>
+    let base: UnsafeMutableRawPointer
+    let header: UnsafeMutablePointer<SwiftNSScreenArrayHeader>
+    let elements: UnsafeMutablePointer<UnsafeRawPointer?>
 }
 
 @_cdecl("swift_nsscreen_primary")
@@ -76,7 +74,7 @@ public func swift_nsscreen_get_screen_array() -> UnsafeRawPointer? {
     view.header.pointee = SwiftNSScreenArrayHeader(
         count: Int32(count),
         reserved: 0,
-        items: view.elements
+        items: UnsafePointer(view.elements)
     )
     writeUnretainedObjectPointers(screens, to: view.elements)
 
