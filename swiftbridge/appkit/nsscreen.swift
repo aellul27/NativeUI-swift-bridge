@@ -8,7 +8,6 @@
 import AppKit
 import CoreGraphics
 
-
 private struct SwiftNSScreenArrayHeader {
     var count: Int32
     var reserved: Int32
@@ -19,7 +18,13 @@ private struct SwiftNSScreenArrayHeader {
 
 private var gScreenArrayBuffer = ReusableRawBuffer()
 private var gScreensStrongRefs: [NSScreen] = []
-private var gPrimaryScreenStrongRef: NSScreen? = nil
+private var gPrimaryScreenStrongRef: NSScreen? = NSScreen.main
+
+private struct NSScreenArrayViewBuffer {
+    var base: UnsafeMutableRawPointer
+    var header: UnsafeMutablePointer<SwiftNSScreenArrayHeader>
+    var elements: UnsafeMutablePointer<UnsafeRawPointer?>
+}
 
 @_cdecl("swift_nsscreen_primary")
 public func swift_nsscreen_primary() -> UnsafeRawPointer? {
@@ -38,8 +43,14 @@ public func swift_nsscreen_primary() -> UnsafeRawPointer? {
 private func makeNSScreenArrayView(
     count: Int,
     buffer: inout ReusableRawBuffer
-) -> (base: UnsafeMutableRawPointer, header: UnsafeMutablePointer<SwiftNSScreenArrayHeader>, elements: UnsafeMutablePointer<UnsafeRawPointer?>)? {
-    return makeArrayView(count: count, buffer: &buffer)
+) -> NSScreenArrayViewBuffer? {
+    guard let view: ArrayView<SwiftNSScreenArrayHeader, UnsafeRawPointer?> = makeArrayView(
+        count: count,
+        buffer: &buffer
+    ) else {
+        return nil
+    }
+    return NSScreenArrayViewBuffer(base: view.base, header: view.header, elements: view.elements)
 }
 
 /// Returns a pointer to a Swift-owned buffer containing:

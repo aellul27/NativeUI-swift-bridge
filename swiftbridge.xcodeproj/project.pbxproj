@@ -100,6 +100,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				998279652EF7F29E008F24A8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				99B027692EED505C003BF93E /* swiftbridge */,
@@ -161,6 +162,9 @@
 			);
 			mainGroup = 99B0275D2EED505C003BF93E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				998279632EF7F25A008F24A8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 99B027682EED505C003BF93E /* Products */;
 			projectDirPath = "";
@@ -207,6 +211,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		998279652EF7F29E008F24A8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 998279642EF7F29E008F24A8 /* SwiftLintBuildToolPlugin */;
+		};
 		99B027752EED505C003BF93E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 99B027662EED505C003BF93E /* swiftbridge */;
@@ -434,8 +442,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R432B9JJ4T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/build/rustbridge_tests-c0f30f037d938517/out/swiftbridge_xcode_deriveddata/Build/Intermediates.noindex/EagerLinkingTBDs/Debug",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/build/rustbridge_tests-c0f30f037d938517/out/swiftbridge_xcode_deriveddata/Build/Products/Debug",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/deps",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = aellul27.nativeui.swiftbridgeTests;
@@ -459,8 +476,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R432B9JJ4T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/build/rustbridge_tests-c0f30f037d938517/out/swiftbridge_xcode_deriveddata/Build/Intermediates.noindex/EagerLinkingTBDs/Debug",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/build/rustbridge_tests-c0f30f037d938517/out/swiftbridge_xcode_deriveddata/Build/Products/Debug",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swiftbridgeTests/rustbridge_tests/target/debug/deps",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = aellul27.nativeui.swiftbridgeTests;
@@ -508,6 +534,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		998279632EF7F25A008F24A8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.62.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		998279642EF7F29E008F24A8 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 998279632EF7F25A008F24A8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 99B0275E2EED505C003BF93E /* Project object */;
 }

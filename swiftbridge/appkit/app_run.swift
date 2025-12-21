@@ -22,8 +22,8 @@ public func swift_appkit_create_app() -> UnsafeMutableRawPointer? {
 // C ABI function to create a window using the provided app pointer
 @_cdecl("swift_appkit_create_window")
 public func swift_appkit_create_window(
-    _ x: Double,
-    _ y: Double,
+    _ originX: Double,
+    _ originY: Double,
     _ width: Double,
     _ height: Double,
     _ titlePtr: UnsafePointer<CChar>?
@@ -37,7 +37,7 @@ public func swift_appkit_create_window(
         let title = String(cString: titlePtr)
 
         let window = NSWindow(
-            contentRect: NSRect(x: x, y: y, width: width, height: height),
+            contentRect: NSRect(x: originX, y: originY, width: width, height: height),
             styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false

@@ -5,7 +5,6 @@
 //  Created by ELLUL, Alexander (Alex) on 13/12/2025.
 //
 
-
 import Foundation
 
 /// Small utilities shared across the framework for bridging Swift data over a C ABI.
@@ -22,7 +21,7 @@ import Foundation
 @usableFromInline
 internal struct ReusableRawBuffer {
     /// Pointer to the allocated storage (Swift-owned). May be nil until first use.
-    @usableFromInline var ptr: UnsafeMutableRawPointer? = nil
+    @usableFromInline var ptr: UnsafeMutableRawPointer?
     /// Current capacity of `ptr` in bytes.
     @usableFromInline var capacityBytes: Int = 0
 
@@ -47,6 +46,13 @@ internal struct ReusableRawBuffer {
     }
 }
 
+@usableFromInline
+internal struct ArrayView<Header, Element> {
+    var base: UnsafeMutableRawPointer
+    var header: UnsafeMutablePointer<Header>
+    var elements: UnsafeMutablePointer<Element>
+}
+
 /// Creates a typed view over a Swift-owned raw buffer laid out as:
 ///
 /// - `Header` (one element)
@@ -61,7 +67,7 @@ internal struct ReusableRawBuffer {
 internal func makeArrayView<Header, Element>(
     count: Int,
     buffer: inout ReusableRawBuffer
-) -> (base: UnsafeMutableRawPointer, header: UnsafeMutablePointer<Header>, elements: UnsafeMutablePointer<Element>)? {
+) -> ArrayView<Header, Element>? {
     let headerSize = MemoryLayout<Header>.stride
     let elementSize = MemoryLayout<Element>.stride
     let bytesNeeded = headerSize + (max(0, count) * elementSize)
@@ -71,7 +77,7 @@ internal func makeArrayView<Header, Element>(
 
     let headerPtr = base.assumingMemoryBound(to: Header.self)
     let elementsPtr = base.advanced(by: headerSize).assumingMemoryBound(to: Element.self)
-    return (base: base, header: headerPtr, elements: elementsPtr)
+    return ArrayView(base: base, header: headerPtr, elements: elementsPtr)
 }
 
 /// Writes an array of object pointers as unretained `UnsafeRawPointer` values.
@@ -86,8 +92,7 @@ internal func writeUnretainedObjectPointers<T: AnyObject>(
     _ objects: [T],
     to out: UnsafeMutablePointer<UnsafeRawPointer?>
 ) {
-    for i in objects.indices {
-        out[i] = UnsafeRawPointer(Unmanaged.passUnretained(objects[i]).toOpaque())
+    for index in objects.indices {
+        out[index] = UnsafeRawPointer(Unmanaged.passUnretained(objects[index]).toOpaque())
     }
 }
-

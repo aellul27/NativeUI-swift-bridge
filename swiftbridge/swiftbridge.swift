@@ -1,4 +1,3 @@
-
 import Foundation
 
 /// Minimal error reporting facility for the C/Rust FFI surface.
@@ -18,42 +17,47 @@ import Foundation
 /// - Do not free the pointer.
 
 private final class SwiftBridgeLastError {
-	private let lock = NSLock()
-	private var message: String? = nil
-	private var cStringBuffer = ReusableRawBuffer()
+    private let lock = NSLock()
+    private var message: String?
+    private var cStringBuffer = ReusableRawBuffer()
 
-	/// Stores/overwrites the current error message.
-	func set(_ message: String) {
-		lock.lock()
-		self.message = message
-		lock.unlock()
-	}
+    /// Stores/overwrites the current error message.
+    func set(_ message: String) {
+        lock.lock()
+        self.message = message
+        lock.unlock()
+    }
 
-	/// Clears the stored error message.
-	func clear() {
-		lock.lock()
-		self.message = nil
-		lock.unlock()
-	}
+    /// Clears the stored error message.
+    func clear() {
+        lock.lock()
+        self.message = nil
+        lock.unlock()
+    }
 
-	/// Returns the current error message as a NUL-terminated UTF-8 C string.
-	///
-	/// The pointer is backed by a reusable Swift-owned buffer.
-	/// Callers must copy the string if they need to keep it.
-	func getCStringPointer() -> UnsafePointer<CChar>? {
-		lock.lock()
-		defer { lock.unlock() }
+    /// Returns the current error message as a NUL-terminated UTF-8 C string.
+    ///
+    /// The pointer is backed by a reusable Swift-owned buffer.
+    /// Callers must copy the string if they need to keep it.
+    func getCStringPointer() -> UnsafePointer<CChar>? {
+        lock.lock()
+        defer { lock.unlock() }
 
-		guard let message = message else { return nil }
-		guard var data = message.data(using: .utf8) else { return nil }
-		data.append(0)
+        guard let message = message else { return nil }
+        guard var data = message.data(using: .utf8) else { return nil }
+        data.append(0)
 
-		guard let base = cStringBuffer.ensure(byteCount: data.count, alignment: MemoryLayout<CChar>.alignment) else { return nil }
-		_ = data.withUnsafeBytes { bytes in
-			memcpy(base, bytes.baseAddress!, data.count)
-		}
-		return UnsafePointer<CChar>(base.assumingMemoryBound(to: CChar.self))
-	}
+        guard let base = cStringBuffer.ensure(
+            byteCount: data.count,
+            alignment: MemoryLayout<CChar>.alignment
+        ) else {
+            return nil
+        }
+        _ = data.withUnsafeBytes { bytes in
+            memcpy(base, bytes.baseAddress!, data.count)
+        }
+        return UnsafePointer<CChar>(base.assumingMemoryBound(to: CChar.self))
+    }
 }
 
 private let gLastError = SwiftBridgeLastError()
@@ -61,7 +65,7 @@ private let gLastError = SwiftBridgeLastError()
 /// Internal helper for Swift code to record an error for the next foreign call to retrieve.
 @usableFromInline
 internal func swiftbridge_set_last_error(_ message: String) {
-	gLastError.set(message)
+    gLastError.set(message)
 }
 
 /// Returns the last error message recorded by the Swift bridge, if any.
@@ -70,12 +74,11 @@ internal func swiftbridge_set_last_error(_ message: String) {
 /// - Important: Valid until the next call to `swiftbridge_last_error()`.
 @_cdecl("swiftbridge_last_error")
 public func swiftbridge_last_error() -> UnsafePointer<CChar>? {
-	return gLastError.getCStringPointer()
+    return gLastError.getCStringPointer()
 }
 
 /// Clears the stored last error.
 @_cdecl("swiftbridge_clear_last_error")
 public func swiftbridge_clear_last_error() {
-	gLastError.clear()
+    gLastError.clear()
 }
-
