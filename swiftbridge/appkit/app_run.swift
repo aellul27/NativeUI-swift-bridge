@@ -79,6 +79,19 @@ public func swift_appkit_run(_ appPtr: UnsafeRawPointer?) {
     app.run()
 }
 
+// C ABI function to run the AppKit event loop using the provided app pointer
+@_cdecl("swift_appkit_activate")
+public func swift_appkit_activate(_ appPtr: UnsafeRawPointer?) {
+    guard let appPtr = appPtr else {
+        swiftbridge_set_last_error("swift_appkit_activate received a null app pointer")
+        return
+    }
+    let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
+
+    app.activate(ignoringOtherApps: true)
+}
+
+
 @_cdecl("swift_appkit_window_close")
 public func swift_window_close(_ windowPtr: UnsafeRawPointer?) {
     guard let windowPtr else { return }
