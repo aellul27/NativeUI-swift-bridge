@@ -86,9 +86,15 @@ public func swift_appkit_activate(_ appPtr: UnsafeRawPointer?) {
         swiftbridge_set_last_error("swift_appkit_activate received a null app pointer")
         return
     }
-    let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
-
-    app.activate(ignoringOtherApps: true)
+    let activate = {
+        let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
+        app.activate(ignoringOtherApps: true)
+    }
+    if Thread.isMainThread {
+        activate()
+    } else {
+        DispatchQueue.main.async(execute: activate)
+    }
 }
 
 // C ABI function to run the AppKit event loop using the provided app pointer
@@ -98,9 +104,15 @@ public func swift_appkit_deactivate(_ appPtr: UnsafeRawPointer?) {
         swiftbridge_set_last_error("swift_appkit_deactivate received a null app pointer")
         return
     }
-    let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
-
-    app.deactivate()
+    let deactivate = {
+        let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
+        app.deactivate()
+    }
+    if Thread.isMainThread {
+        deactivate()
+    } else {
+        DispatchQueue.main.async(execute: deactivate)
+    }
 }
 
 
