@@ -79,7 +79,7 @@ public func swift_appkit_run(_ appPtr: UnsafeRawPointer?) {
     app.run()
 }
 
-// C ABI function to run the AppKit event loop using the provided app pointer
+// C ABI function to focus the app
 @_cdecl("swift_appkit_activate")
 public func swift_appkit_activate(_ appPtr: UnsafeRawPointer?) {
     guard let appPtr = appPtr else {
@@ -97,7 +97,7 @@ public func swift_appkit_activate(_ appPtr: UnsafeRawPointer?) {
     }
 }
 
-// C ABI function to run the AppKit event loop using the provided app pointer
+// C ABI function to defocus the app
 @_cdecl("swift_appkit_deactivate")
 public func swift_appkit_deactivate(_ appPtr: UnsafeRawPointer?) {
     guard let appPtr = appPtr else {
@@ -112,6 +112,24 @@ public func swift_appkit_deactivate(_ appPtr: UnsafeRawPointer?) {
         deactivate()
     } else {
         DispatchQueue.main.async(execute: deactivate)
+    }
+}
+
+// C ABI function to stop the AppKit event loop using the provided app pointer
+@_cdecl("swift_appkit_stop")
+public func swift_appkit_stop(_ appPtr: UnsafeRawPointer?) {
+    guard let appPtr = appPtr else {
+        swiftbridge_set_last_error("swift_appkit_stop received a null app pointer")
+        return
+    }
+    let stop = {
+        let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
+        app.stop(nil)
+    }
+    if Thread.isMainThread {
+        stop()
+    } else {
+        DispatchQueue.main.async(execute: stop)
     }
 }
 
