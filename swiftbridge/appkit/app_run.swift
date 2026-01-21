@@ -134,6 +134,25 @@ public func swift_appkit_stop(_ appPtr: UnsafeRawPointer?) {
 }
 
 
+// C ABI function to terminate the App (close)
+@_cdecl("swift_appkit_terminate")
+public func swift_appkit_terminate(_ appPtr: UnsafeRawPointer?) {
+    guard let appPtr = appPtr else {
+        swiftbridge_set_last_error("swift_appkit_terminate received a null app pointer")
+        return
+    }
+    let terminate = {
+        let app = Unmanaged<NSApplication>.fromOpaque(appPtr).takeUnretainedValue()
+        app.terminate(nil);
+    }
+    if Thread.isMainThread {
+        terminate()
+    } else {
+        DispatchQueue.main.async(execute: terminate)
+    }
+}
+
+
 @_cdecl("swift_appkit_window_close")
 public func swift_window_close(_ windowPtr: UnsafeRawPointer?) {
     guard let windowPtr else { return }
