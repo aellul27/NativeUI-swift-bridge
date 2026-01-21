@@ -43,6 +43,7 @@ public func swift_appkit_create_window(
             defer: false
         )
 
+        window.isReleasedWhenClosed = false
         window.title = title
         window.center()
         window.makeKeyAndOrderFront(nil)
