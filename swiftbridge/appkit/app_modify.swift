@@ -106,24 +106,3 @@ public func swift_appkit_set_size(
         window.setFrame(frame, display: true)
     }
 }
-
-@_cdecl("swift_appkit_close_window")
-public func swift_appkit_close_window(_ windowPtr: UnsafeRawPointer?) {
-    guard let windowPtr else {
-        swiftbridge_set_last_error("swift_appkit_close_window received a null window pointer")
-        return
-    }
-
-    let closeWindow = {
-        guard let window = windowFromPointer(windowPtr, caller: "swift_appkit_close_window") else {
-            return
-        }
-        window.close()
-    }
-
-    if Thread.isMainThread {
-        closeWindow()
-    } else {
-        DispatchQueue.main.async(execute: closeWindow)
-    }
-}
